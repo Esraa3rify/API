@@ -14,8 +14,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,28 +42,57 @@ public class MainActivity extends AppCompatActivity {
         GetCityID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+           RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+           String url = "https://www.metaweather.com/api/location/search/?query=london";
 
-                // Instantiate the RequestQueue.
-                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-                String url = "https://www.metaweather.com/api/location/search/?query=london";
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+                        (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
-              // Request a string response from the provided URL.
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
                             @Override
-                            public void onResponse(String response) {
-                                // Display the first 500 characters of the response string.
-                                Toast.makeText(MainActivity.this,response,Toast.LENGTH_SHORT).show();
+                            public void onResponse(JSONObject response) {
+                                String cityId;
+                                try {
+                                    JSONObject CityInfo = response.getJSONObject("0");
+                                     cityId=CityInfo.getString("woeid");
+                                } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                Toast.makeText(MainActivity.this,"The city ID is:"+cityId.toString(),Toast.LENGTH_SHORT).show();
                             }
                         }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(MainActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
-                    }
-                });
 
-               // Add the request to the RequestQueue.
-                queue.add(stringRequest);
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(MainActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+                queue.add(jsonObjectRequest);
+
+
+
+//                // Instantiate the RequestQueue.
+//                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
+//                String url = "https://www.metaweather.com/api/location/search/?query=london";
+//
+//              // Request a string response from the provided URL.
+//                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+//                        new Response.Listener<String>() {
+//                            @Override
+//                            public void onResponse(String response) {
+//                                // Display the first 500 characters of the response string.
+//                                Toast.makeText(MainActivity.this,response,Toast.LENGTH_SHORT).show();
+//                            }
+//                        }, new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Toast.makeText(MainActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//
+//               // Add the request to the RequestQueue.
+//                queue.add(stringRequest);
             }
         });
 
