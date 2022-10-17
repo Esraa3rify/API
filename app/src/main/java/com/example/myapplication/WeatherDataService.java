@@ -11,11 +11,13 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WeatherDataService {
 
     public static final String QUERY_FOR_CITY_ID = "https://www.metaweather.com/api/location/search/?query";
+    public static final String QUERY_FOR_WEATHER_BY_ID = "https://www.metaweather.com/api/location/search";
     Context context;
     String cityId="";
 
@@ -23,7 +25,13 @@ public class WeatherDataService {
         this.context=context;
     }
 
-    public String getCityID(String cityName){
+    public interface VolleyResponseListener {
+        void onError(String message);
+
+        void onResponse(String cityId);
+    }
+
+    public void getCityID(String cityName,  VolleyResponseListener volleyResponseListener){
 
         // RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
         String url = QUERY_FOR_CITY_ID +cityName;
@@ -40,25 +48,47 @@ public class WeatherDataService {
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
-                        Toast.makeText(context,"The city ID is:"+cityId.toString(),Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(context,"The city ID is:"+cityId.toString(),Toast.LENGTH_SHORT).show();
+                        volleyResponseListener.onResponse(cityId);
                     }
                 }, new Response.ErrorListener() {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(context,"ERROR",Toast.LENGTH_SHORT).show();
+                        volleyResponseListener.onError("Something going wrong!");
 
                     }
                 });
 
         MySingleton.getInstance(context).addToRequestQueue(jsonObjectRequest);
-        return  cityId;
+        //return  cityId;
 
     }
 //
-//    public List <WeatherReportModel> getCityForecastByID (String cityID){
-//
-//    }
+   public void getCityForecastByID (String cityID) {
+
+       String url = QUERY_FOR_WEATHER_BY_ID + cityID;
+       List<WeatherReportModel> report = new ArrayList<>();
+
+       JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
+               (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                   @Override
+                   public void onResponse(JSONObject response) {
+                       Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show();
+
+                   }
+               }, new Response.ErrorListener() {
+                   @Override
+                   public void onErrorResponse(VolleyError error) {
+                       Toast.makeText(context, "Error!", Toast.LENGTH_SHORT).show();
+
+
+                   }
+               });
+
+   }
 //
 //    public List <WeatherReportModel> getCityForecastByName(String cityName){
 //

@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     EditText ETCityName;
     ListView list;
 
+
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,40 +41,45 @@ public class MainActivity extends AppCompatActivity {
         ETCityName=findViewById(R.id.editTextCityName);
         list=findViewById(R.id.List);
 
+
+        WeatherDataService weatherDataService = new WeatherDataService(MainActivity.this);
+
+
         GetCityID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String cityID="";
                 //instance from the class
-                WeatherDataService weatherDataService = new WeatherDataService(MainActivity.this);
-                String cityID =weatherDataService.getCityID("Miami");
-                Toast.makeText(MainActivity.this,"Returned the ID:"+cityID,Toast.LENGTH_SHORT).show();
+                weatherDataService.getCityID("Miami", new WeatherDataService.VolleyResponseListener() {
+                    @Override
+                    public void onError(String message) {
+                        Toast.makeText(MainActivity.this,"some thing going wrong!",Toast.LENGTH_SHORT).show();
+
+                    }
+
+                    @Override
+                    public void onResponse(String cityId) {
+                        Toast.makeText(MainActivity.this,"Returned the ID:"+cityID,Toast.LENGTH_SHORT).show();
+
+                    }
+                });
 
 
-
-
-//                // Instantiate the RequestQueue.
-//                RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-//                String url = "https://www.metaweather.com/api/location/search/?query=london";
-//
-//              // Request a string response from the provided URL.
-//                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-//                        new Response.Listener<String>() {
-//                            @Override
-//                            public void onResponse(String response) {
-//                                // Display the first 500 characters of the response string.
-//                                Toast.makeText(MainActivity.this,response,Toast.LENGTH_SHORT).show();
-//                            }
-//                        }, new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        Toast.makeText(MainActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//
-//               // Add the request to the RequestQueue.
-//                queue.add(stringRequest);
             }
         });
+
+        GetWeatherByID.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                weatherDataService.getCityForecastByID("Miami");
+
+
+            }
+
+        });
+
+
 
 
 
