@@ -42,33 +42,11 @@ public class MainActivity extends AppCompatActivity {
         GetCityID.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-           RequestQueue queue = Volley.newRequestQueue(MainActivity.this);
-           String url = "https://www.metaweather.com/api/location/search/?query=london";
+                //instance from the class
+                WeatherDataService weatherDataService = new WeatherDataService(MainActivity.this);
+                String cityID =weatherDataService.getCityID("Miami");
+                Toast.makeText(MainActivity.this,"Returned the ID:"+cityID,Toast.LENGTH_SHORT).show();
 
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
-                        (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                String cityId;
-                                try {
-                                    JSONObject CityInfo = response.getJSONObject("0");
-                                     cityId=CityInfo.getString("woeid");
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                                Toast.makeText(MainActivity.this,"The city ID is:"+cityId.toString(),Toast.LENGTH_SHORT).show();
-                            }
-                        }, new Response.ErrorListener() {
-
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(MainActivity.this,"ERROR",Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-
-                queue.add(jsonObjectRequest);
 
 
 
