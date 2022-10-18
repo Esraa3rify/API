@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,8 +66,17 @@ public class WeatherDataService {
         //return  cityId;
 
     }
+
+
+    public interface CityByIDResponseListener {
+        void onError(String message);
+
+      void onResponse(WeatherReportModel weatherReportModel) ;
+
+
+    }
 //
-   public void getCityForecastByID (String cityID) {
+   public void getCityForecastByID (String cityID,  CityByIDResponseListener cityByIDResponseListener) {
 
        String url = QUERY_FOR_WEATHER_BY_ID + cityID;
        List<WeatherReportModel> report = new ArrayList<>();
@@ -77,6 +87,33 @@ public class WeatherDataService {
                    @Override
                    public void onResponse(JSONObject response) {
                        Toast.makeText(context, response.toString(), Toast.LENGTH_SHORT).show();
+
+                       JSONArray minutely;
+
+                       try {
+                           minutely = response.getJSONArray("minutely");
+                       } catch (JSONException e) {
+                           throw new RuntimeException(e);
+                       }
+
+
+
+                       try {
+                           JSONObject firstMinuteFromAPI =(JSONObject) minutely.get(0);
+
+
+                           WeatherReportModel firstMinute = new WeatherReportModel();
+
+                           firstMinute.setPrecipitation(20);
+                           firstMinute.setDt(1);
+
+                           CityByIDResponseListener.onResponse(firstMinute);
+
+                       } catch (JSONException e) {
+                           throw new RuntimeException(e);
+                       }
+
+
 
                    }
                }, new Response.ErrorListener() {

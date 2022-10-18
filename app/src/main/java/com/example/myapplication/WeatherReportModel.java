@@ -10,6 +10,10 @@ public class WeatherReportModel {
         this.precipitation = precipitation;
     }
 
+    public WeatherReportModel() {
+
+    }
+
     @Override
     public String toString() {
         return "WeatherReportModel{" +
